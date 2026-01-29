@@ -1,0 +1,81 @@
+generator client {
+  provider = "prisma-client-js"
+  previewFeatures = ["driverAdapters"]
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Role {
+  TEACHER
+  STUDENT
+}
+
+enum SubmissionStatus {
+  SUBMITTED
+  GRADED
+}
+
+model User {
+  id            Int          @id @default(autoincrement())
+  name          String
+  email         String       @unique
+  password_hash String
+  role          Role
+  created_at    DateTime     @default(now())
+  updated_at    DateTime     @updatedAt
+
+  courses_taught Course[]    @relation("TeacherCourses")
+  enrollments    Enrollment[]
+  submissions    Submission[]
+}
+
+model Course {
+  id          Int          @id @default(autoincrement())
+  title       String
+  description String?
+  teacher_id  Int
+  created_at  DateTime     @default(now())
+  updated_at  DateTime     @updatedAt
+
+  teacher     User         @relation("TeacherCourses", fields: [teacher_id], references: [id])
+  enrollments Enrollment[]
+  assignments Assignment[]
+}
+
+model Enrollment {
+  student_id Int
+  course_id  Int
+  enrolled_at DateTime @default(now())
+
+  student    User   @relation(fields: [student_id], references: [id])
+  course     Course @relation(fields: [course_id], references: [id])
+
+  @@id([student_id, course_id])
+}
+
+model Assignment {
+  id          Int          @id @default(autoincrement())
+  course_id   Int
+  title       String
+  description String?
+  due_date    DateTime
+  created_at  DateTime     @default(now())
+
+  course      Course       @relation(fields: [course_id], references: [id])
+  submissions Submission[]
+}
+
+model Submission {
+  id            Int              @id @default(autoincrement())
+  assignment_id Int
+  student_id    Int
+  content       String
+  grade         Float?
+  status        SubmissionStatus @default(SUBMITTED)
+  submitted_at  DateTime         @default(now())
+
+  assignment    Assignment       @relation(fields: [assignment_id], references: [id])
+  student       User             @relation(fields: [student_id], references: [id])
+}
