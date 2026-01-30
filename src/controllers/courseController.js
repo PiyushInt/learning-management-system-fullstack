@@ -22,6 +22,15 @@ export const getCourses = async (req, res) => {
     }
 };
 
+export const getEnrolledCourses = async (req, res) => {
+    try {
+        const courses = await courseService.getEnrolledCourses(req.user.id);
+        res.json(courses);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
+
 export const enrollStudent = async (req, res) => {
     try {
         const { id: courseId } = req.params;

@@ -21,6 +21,23 @@ export const getCourses = async () => {
     });
 };
 
+export const getEnrolledCourses = async (studentId) => {
+    return await prisma.course.findMany({
+        where: {
+            enrollments: {
+                some: {
+                    student_id: studentId
+                }
+            }
+        },
+        include: {
+            teacher: {
+                select: { name: true, email: true }
+            }
+        }
+    });
+};
+
 export const enrollStudent = async (courseId, studentId) => {
     const existingEnrollment = await prisma.enrollment.findUnique({
         where: {

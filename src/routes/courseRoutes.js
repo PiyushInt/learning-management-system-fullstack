@@ -6,6 +6,7 @@ import { authenticateToken, authorizeRole } from '../middlewares/authMiddleware.
 const router = express.Router();
 
 router.get('/', getCourses);
+router.get('/enrolled', authenticateToken, authorizeRole('STUDENT'), getEnrolledCourses);
 router.post('/', authenticateToken, authorizeRole('TEACHER'), createCourse);
 router.post('/:id/enroll', authenticateToken, authorizeRole('STUDENT'), enrollStudent);
 
