@@ -1,12 +1,12 @@
 import { PrismaClient } from '@prisma/client';
-import { PrismaPg } from '@prisma/adapter-pg';
-import pg from 'pg';
 import dotenv from 'dotenv';
 dotenv.config();
 
-const connectionString = process.env.DATABASE_URL.replace('prisma+postgres://', 'postgresql://');
-const pool = new pg.Pool({ connectionString });
-const adapter = new PrismaPg(pool);
-const prisma = new PrismaClient({ adapter });
+// Fix: Replace prisma+postgres with postgresql to ensure standard client behavior
+if (process.env.DATABASE_URL && process.env.DATABASE_URL.startsWith('prisma+postgres://')) {
+    process.env.DATABASE_URL = process.env.DATABASE_URL.replace('prisma+postgres://', 'postgresql://');
+}
+
+const prisma = new PrismaClient({});
 
 export default prisma;
