@@ -5,6 +5,6 @@ export const createCourseSchema = Joi.object({
     description: Joi.string().optional()
 });
 
-export const enrollSchema = Joi.object({
-    // No body params needed strictly if using clean URLs, but maybe useful later
-});
+
+export const enrollSchema = Joi.object({});
+
