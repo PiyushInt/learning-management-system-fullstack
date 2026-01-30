@@ -1,16 +1,62 @@
-# React + Vite
+# LMS Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A modern, responsive frontend for the Learning Management System, built with **React**, **Redux Toolkit**, and **CSS Modules**.
 
-Currently, two official plugins are available:
+## ✨ Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+### 👩‍🏫 Teacher Portal
+- **Dashboard**: View all created courses.
+- **Course Management**: Create new courses with details.
+- **Assignments**: Create assignments and view student submissions.
+- **Secure Access**: Protected routes for teachers only.
 
-## React Compiler
+![Teacher Dashboard](./screenshots/teacher_dashboard.png)
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+### 👨‍🎓 Student Portal
+- **Dashboard**: View enrolled courses.
+- **Browse Courses**: Discover and enroll in new courses.
+- **Assignment Submission**: Submit work for assignments.
+- **Learning Tracking**: clear overview of active courses.
 
-## Expanding the ESLint configuration
+![Student Dashboard](./screenshots/student_dashboard.png)
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## 🛠 Tech Stack
+- **Framework**: React (Vite)
+- **State Management**: Redux Toolkit (includes async thunks)
+- **Routing**: React Router v6
+- **Styling**: CSS Modules (scoped styles) + Global CSS variables
+- **HTTP Client**: Axios (with interceptors)
+- **Icons**: Lucide React
+
+## 🚀 Getting Started
+
+1. **Install Dependencies**
+   ```bash
+   cd frontend
+   npm install
+   ```
+
+2. **Start Development Server**
+   ```bash
+   npm run dev
+   ```
+   Access the app at `http://localhost:5173`.
+
+3. **Backend Requirement**
+   Ensure the backend API is running on `http://localhost:3000`.
+
+## 📂 Project Structure
+```
+src/
+ ├── components/       # Reusable UI components (Button, Input, Layout)
+ ├── pages/            # Page components (Dashboard, Login, CourseDetail)
+ ├── store/            # Redux slices (auth, course, assignment)
+ ├── services/         # API service definitions
+ └── utils/            # Helper functions
+```
+
+## 🧪 Verification
+To verify the application:
+1. Register as a **Teacher** to create courses.
+2. Register as a **Student** to browse and enroll.
+3. Use the **Course Detail** page to manage assignments.
