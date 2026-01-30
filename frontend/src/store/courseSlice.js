@@ -34,6 +34,17 @@ export const createNewCourse = createAsyncThunk(
     }
 );
 
+export const enrollInCourse = createAsyncThunk(
+    'courses/enroll',
+    async (courseId, { rejectWithValue }) => {
+        try {
+            return await courseService.enrollStudent(courseId);
+        } catch (error) {
+            return rejectWithValue(error.response?.data?.error || 'Failed to enroll');
+        }
+    }
+);
+
 const initialState = {
     list: [],
     enrolledList: [],
@@ -78,6 +89,9 @@ const courseSlice = createSlice({
             })
             .addCase(createNewCourse.fulfilled, (state, action) => {
                 state.list.push(action.payload);
+            })
+            .addCase(enrollInCourse.rejected, (state, action) => {
+                state.error = action.payload;
             });
     },
 });

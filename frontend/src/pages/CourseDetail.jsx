@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchAssignments, createAssignment, submitAssignment, fetchSubmissions } from '../store/assignmentSlice';
+import { enrollInCourse, fetchEnrolledCourses } from '../store/courseSlice';
 import Layout from '../components/Layout';
 import Button from '../components/ui/Button';
 import Input from '../components/ui/Input';
@@ -10,20 +11,26 @@ import styles from './CourseDetail.module.css';
 const CourseDetail = () => {
     const { id } = useParams();
     const dispatch = useDispatch();
+    const navigate = useNavigate();
     const { list: assignments, submissionsMap, loading, error } = useSelector((state) => state.assignments);
+    const { enrolledList } = useSelector((state) => state.courses);
     const { role } = useSelector((state) => state.auth);
 
     const [showCreateModal, setShowCreateModal] = useState(false);
     const [newAssignment, setNewAssignment] = useState({ title: '', description: '', due_date: '' });
     const [submissionContent, setSubmissionContent] = useState('');
     const [selectedAssignmentId, setSelectedAssignmentId] = useState(null);
-
-    // For viewing submissions
     const [viewSubmissionsId, setViewSubmissionsId] = useState(null);
 
+    const isEnrolled = enrolledList.some(c => c.id === parseInt(id));
+
     useEffect(() => {
+        // If student, create check for enrollment.
+        if (role === 'STUDENT') {
+            dispatch(fetchEnrolledCourses());
+        }
         dispatch(fetchAssignments(id));
-    }, [dispatch, id]);
+    }, [dispatch, id, role]);
 
     const handleCreate = async (e) => {
         e.preventDefault();
@@ -41,6 +48,12 @@ const CourseDetail = () => {
         alert('Assignment submitted!');
     };
 
+    const handleEnroll = async () => {
+        await dispatch(enrollInCourse(id));
+        await dispatch(fetchEnrolledCourses()); // Refresh list
+        alert('Enrolled successfully!');
+    };
+
     const handleViewSubmissions = (assignmentId) => {
         setViewSubmissionsId(assignmentId);
         dispatch(fetchSubmissions(assignmentId));
@@ -56,6 +69,14 @@ const CourseDetail = () => {
                     <Button onClick={() => setShowCreateModal(true)} className={styles.createBtn}>
                         Add Assignment
                     </Button>
+                )}
+                {role === 'STUDENT' && !isEnrolled && (
+                    <Button onClick={handleEnroll} className={styles.createBtn}>
+                        Enroll in Course
+                    </Button>
+                )}
+                {role === 'STUDENT' && isEnrolled && (
+                    <span style={{ color: 'green', fontWeight: 'bold' }}>Enrolled</span>
                 )}
             </div>
 
@@ -82,7 +103,7 @@ const CourseDetail = () => {
                                 )}
                             </div>
 
-                            {role === 'STUDENT' && (
+                            {role === 'STUDENT' && isEnrolled && (
                                 <div className={styles.studentActions}>
                                     <Button onClick={() => setSelectedAssignmentId(assignment.id)}>
                                         Submit Work
@@ -94,7 +115,7 @@ const CourseDetail = () => {
                 )}
             </div>
 
-            {/* Create Assignment Modal */}
+            {/* Modals ... (same as before) */}
             {showCreateModal && (
                 <div className={styles.modalOverlay}>
                     <div className={styles.modal}>
@@ -115,7 +136,6 @@ const CourseDetail = () => {
                 </div>
             )}
 
-            {/* Submit Assignment Modal */}
             {selectedAssignmentId && (
                 <div className={styles.modalOverlay}>
                     <div className={styles.modal}>
@@ -134,7 +154,6 @@ const CourseDetail = () => {
                 </div>
             )}
 
-            {/* View Submissions Modal */}
             {viewSubmissionsId && (
                 <div className={styles.modalOverlay}>
                     <div className={styles.modal} style={{ maxWidth: '600px' }}>

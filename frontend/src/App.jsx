@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import Login from './pages/Login';
 import TeacherDashboard from './pages/TeacherDashboard';
 import StudentDashboard from './pages/StudentDashboard';
+import BrowseCourses from './pages/BrowseCourses';
 import CourseDetail from './pages/CourseDetail';
 import PrivateRoute from './components/PrivateRoute';
 
@@ -22,6 +23,11 @@ function App() {
         <Route path="/student-dashboard" element={
           <PrivateRoute role="STUDENT">
             <StudentDashboard />
+          </PrivateRoute>
+        } />
+        <Route path="/browse" element={
+          <PrivateRoute role="STUDENT">
+            <BrowseCourses />
           </PrivateRoute>
         } />
         <Route path="/courses/:id" element={

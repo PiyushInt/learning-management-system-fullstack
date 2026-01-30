@@ -1,55 +1,52 @@
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { fetchEnrolledCourses } from '../store/courseSlice';
+import { fetchCourses } from '../store/courseSlice';
 import Layout from '../components/Layout';
 import CourseCard from '../components/CourseCard';
 import styles from './Dashboard.module.css';
 
-const StudentDashboard = () => {
+const BrowseCourses = () => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
-    const { enrolledList, loading, error } = useSelector((state) => state.courses);
+    const { list, loading, error } = useSelector((state) => state.courses);
 
     useEffect(() => {
-        dispatch(fetchEnrolledCourses());
+        dispatch(fetchCourses());
     }, [dispatch]);
+
+    // Optionally filter out courses already enrolled if I had that list
+    // For now just show all
 
     return (
         <Layout>
             <div className={styles.header}>
                 <div>
-                    <h1 className={styles.title}>My Learning</h1>
-                    <p className={styles.subtitle}>Courses you are enrolled in</p>
+                    <h1 className={styles.title}>Browse Courses</h1>
+                    <p className={styles.subtitle}>Find new courses to join</p>
                 </div>
-                <button
-                    className={styles.createBtn}
-                    onClick={() => navigate('/browse')}
-                    style={{ padding: '0.5rem 1rem', background: '#4f46e5', color: 'white', border: 'none', borderRadius: '0.375rem', cursor: 'pointer' }}
-                >
-                    Browse Courses
-                </button>
             </div>
 
             {loading && <div className={styles.loader}>Loading courses...</div>}
             {error && <div className={styles.error}>{error}</div>}
 
             <div className={styles.grid}>
-                {enrolledList.length > 0 ? (
-                    enrolledList.map((course) => (
+                {list.length > 0 ? (
+                    list.map((course) => (
                         <CourseCard
                             key={course.id}
                             course={course}
-                            actionLabel="Go to Course"
+                            actionLabel="View Details"
                             onAction={(id) => navigate(`/courses/${id}`)}
+                        // Teacher name is in course.teacher.name
                         />
                     ))
                 ) : (
-                    !loading && <p className={styles.emptyState}>You are not enrolled in any courses yet.</p>
+                    !loading && <p className={styles.emptyState}>No courses available.</p>
                 )}
             </div>
         </Layout>
     );
 };
 
-export default StudentDashboard;
+export default BrowseCourses;
