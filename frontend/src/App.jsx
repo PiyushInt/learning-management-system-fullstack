@@ -14,7 +14,7 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/" element={<Navigate to="/login" replace />} />
 
-        {/* Protected Routes */}
+
         <Route path="/teacher-dashboard" element={
           <PrivateRoute role="TEACHER">
             <TeacherDashboard />

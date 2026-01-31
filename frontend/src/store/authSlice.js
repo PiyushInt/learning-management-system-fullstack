@@ -76,9 +76,14 @@ const authSlice = createSlice({
                 state.loading = true;
                 state.error = null;
             })
-            .addCase(registerUser.fulfilled, (state) => {
+            .addCase(registerUser.fulfilled, (state, action) => {
                 state.loading = false;
-                // Registration usually doesn't auto-login unless specified, backend returns { message, userId } usually.
+                state.isAuthenticated = true;
+                state.token = action.payload.token;
+                state.user = action.payload.user;
+                state.role = action.payload.user.role;
+                localStorage.setItem('token', action.payload.token);
+                localStorage.setItem('user', JSON.stringify(action.payload.user));
             })
             .addCase(registerUser.rejected, (state, action) => {
                 state.loading = false;

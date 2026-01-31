@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchAssignments, createAssignment, submitAssignment, fetchSubmissions } from '../store/assignmentSlice';
-import { enrollInCourse, fetchEnrolledCourses } from '../store/courseSlice';
+import { enrollInCourse, fetchEnrolledCourses, fetchCourses } from '../store/courseSlice';
 import Layout from '../components/Layout';
 import Button from '../components/ui/Button';
 import Input from '../components/ui/Input';

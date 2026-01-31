@@ -21,6 +21,17 @@ export const getCourses = async () => {
     });
 };
 
+export const getCourseById = async (id) => {
+    return await prisma.course.findUnique({
+        where: { id: parseInt(id) },
+        include: {
+            teacher: {
+                select: { name: true, email: true }
+            }
+        }
+    });
+};
+
 export const getEnrolledCourses = async (studentId) => {
     return await prisma.course.findMany({
         where: {
