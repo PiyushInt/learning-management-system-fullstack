@@ -1,12 +1,15 @@
 import { PrismaClient } from '@prisma/client';
+import { PrismaPg } from '@prisma/adapter-pg';
+import pg from 'pg';
 import dotenv from 'dotenv';
 dotenv.config();
 
-// Fix: Replace prisma+postgres with postgresql to ensure standard client behavior
-if (process.env.DATABASE_URL && process.env.DATABASE_URL.startsWith('prisma+postgres://')) {
-    process.env.DATABASE_URL = process.env.DATABASE_URL.replace('prisma+postgres://', 'postgresql://');
-}
+// Use direct TCP connection to port 51214 (Prisma Postgres TCP interface)
+// Using hardcoded credentials as seen in the decoded api_key or assumed defaults of prisma dev
+const connectionString = "postgresql://postgres:postgres@localhost:51214/postgres?sslmode=disable";
 
-const prisma = new PrismaClient({});
+const pool = new pg.Pool({ connectionString });
+const adapter = new PrismaPg(pool);
+const prisma = new PrismaClient({ adapter });
 
 export default prisma;

@@ -12,8 +12,8 @@ const CourseDetail = () => {
     const { id } = useParams();
     const dispatch = useDispatch();
     const navigate = useNavigate();
-    const { list: assignments, submissionsMap, loading, error } = useSelector((state) => state.assignments);
-    const { enrolledList } = useSelector((state) => state.courses);
+    const { list: assignments, submissionsMap, loading: loadingAssignments, error: errorAssignments } = useSelector((state) => state.assignments);
+    const { enrolledList, list: allCourses, loading: loadingCourses } = useSelector((state) => state.courses);
     const { role } = useSelector((state) => state.auth);
 
     const [showCreateModal, setShowCreateModal] = useState(false);
@@ -22,15 +22,21 @@ const CourseDetail = () => {
     const [selectedAssignmentId, setSelectedAssignmentId] = useState(null);
     const [viewSubmissionsId, setViewSubmissionsId] = useState(null);
 
-    const isEnrolled = enrolledList.some(c => c.id === parseInt(id));
+    const courseId = parseInt(id);
+    const course = allCourses.find(c => c.id === courseId) || enrolledList.find(c => c.id === courseId);
+    const isEnrolled = enrolledList.some(c => c.id === courseId);
 
     useEffect(() => {
-        // If student, create check for enrollment.
+        if (!course) {
+            dispatch(fetchCourses());
+        }
         if (role === 'STUDENT') {
             dispatch(fetchEnrolledCourses());
         }
+        // Only fetch assignments if enrolled or teacher (to avoid 403)
+        // Ideally backend should handle this, but for now we try.
         dispatch(fetchAssignments(id));
-    }, [dispatch, id, role]);
+    }, [dispatch, id, role, course]);
 
     const handleCreate = async (e) => {
         e.preventDefault();
@@ -61,10 +67,17 @@ const CourseDetail = () => {
 
     const currentSubmissions = viewSubmissionsId ? submissionsMap[viewSubmissionsId] || [] : [];
 
+    if (loadingCourses && !course) return <p>Loading course details...</p>;
+    if (!course) return <p>Course not found.</p>;
+
     return (
         <Layout>
             <div className={styles.header}>
-                <h1>Course Details</h1>
+                <div>
+                    <h1>{course.title}</h1>
+                    <p>{course.description}</p>
+                    <p><small>Instructor: {course.teacher?.name || 'Unknown'}</small></p>
+                </div>
                 {role === 'TEACHER' && (
                     <Button onClick={() => setShowCreateModal(true)} className={styles.createBtn}>
                         Add Assignment
@@ -80,8 +93,8 @@ const CourseDetail = () => {
                 )}
             </div>
 
-            {loading && <p>Loading assignments...</p>}
-            {error && <p className={styles.error}>{error}</p>}
+            {loadingAssignments && <p>Loading assignments...</p>}
+            {errorAssignments && <p className={styles.error}>{errorAssignments}</p>}
 
             <div className={styles.assignmentList}>
                 <h2>Assignments</h2>
