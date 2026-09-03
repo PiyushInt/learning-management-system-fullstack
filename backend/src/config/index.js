@@ -4,7 +4,7 @@ import Joi from 'joi';
 dotenv.config();
 
 const envSchema = Joi.object({
-    NODE_ENV: Joi.string().valid('development', 'production', 'test').default('development'),
+    NODE_ENV: Joi.string().valid('development', 'production', 'test').default('production'),
     PORT: Joi.number().default(3000),
     DATABASE_URL: Joi.string().required(),
     JWT_SECRET: Joi.string().required(),
