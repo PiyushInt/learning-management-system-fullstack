@@ -3,12 +3,14 @@ import app from '../src/app.js';
 import prisma from '../src/utils/prisma.js';
 import logger from '../src/middlewares/logger.js';
 import winston from 'winston';
-import { loginLimiter } from '../src/routes/authRoutes.js';
+import { loginLimiter, registerLimiter } from '../src/routes/authRoutes.js';
 
 describe('Resilience and Hardening', () => {
     beforeEach(() => {
         loginLimiter.resetKey('::ffff:127.0.0.1');
         loginLimiter.resetKey('127.0.0.1');
+        registerLimiter.resetKey('::ffff:127.0.0.1');
+        registerLimiter.resetKey('127.0.0.1');
     });
     describe('GET /health', () => {
         it('returns 200 OK without DB dependency', async () => {
@@ -59,6 +61,24 @@ describe('Resilience and Hardening', () => {
                 .post('/auth/login')
                 .send({ email: 'test@example.com', password: 'password123' });
             expect(res429.statusCode).toBe(429);
+        });
+
+        it('returns 429 when register limit is exceeded', async () => {
+            const limit = parseInt(process.env.RATE_LIMIT_REGISTER_MAX || 10);
+
+            // Fire 'limit' registration requests (they'll 500 or 201, doesn't matter)
+            for (let i = 0; i < limit; i++) {
+                await request(app)
+                    .post('/auth/register')
+                    .send({ name: 'User', email: `rl${i}@test.com`, password: 'password123', role: 'STUDENT' });
+            }
+
+            // The limit + 1 request should be rate limited
+            const res429 = await request(app)
+                .post('/auth/register')
+                .send({ name: 'User', email: 'rl_over@test.com', password: 'password123', role: 'STUDENT' });
+            expect(res429.statusCode).toBe(429);
+            expect(res429.body).toHaveProperty('error', 'TOO_MANY_REQUESTS');
         });
     });
 
