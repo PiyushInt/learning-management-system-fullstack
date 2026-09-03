@@ -16,7 +16,9 @@ export const createCourse = async (req, res, next) => {
 
 export const getCourses = async (req, res, next) => {
     try {
-        const courses = await courseService.getCourses();
+        const page = parseInt(req.query.page) || 1;
+        const limit = Math.min(parseInt(req.query.limit) || 20, 100);
+        const courses = await courseService.getCourses(page, limit);
         res.json(courses);
     } catch (error) {
         next(error);
@@ -38,7 +40,9 @@ export const getCourse = async (req, res, next) => {
 
 export const getEnrolledCourses = async (req, res, next) => {
     try {
-        const courses = await courseService.getEnrolledCourses(req.user.id);
+        const page = parseInt(req.query.page) || 1;
+        const limit = Math.min(parseInt(req.query.limit) || 20, 100);
+        const courses = await courseService.getEnrolledCourses(req.user.id, page, limit);
         res.json(courses);
     } catch (error) {
         next(error);

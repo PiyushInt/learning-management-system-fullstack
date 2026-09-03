@@ -1,8 +1,16 @@
 import { config } from '../config/index.js';
 
 export const errorHandler = (err, req, res, next) => {
-    const statusCode = err.statusCode || 500;
+    let statusCode = err.statusCode || 500;
     const isDevelopment = config.env === 'development';
+    
+    // Map Prisma unique constraint violations to 409 Conflict
+    if (err.code === 'P2002') {
+        statusCode = 409;
+        err.isOperational = true;
+        err.message = 'Resource already exists';
+        err.code = 'CONFLICT';
+    }
     
     // Log unexpected errors fully in production, and all errors fully in development
     if (isDevelopment) {

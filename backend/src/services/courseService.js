@@ -12,8 +12,11 @@ export const createCourse = async (courseData, teacherId) => {
     });
 };
 
-export const getCourses = async () => {
+export const getCourses = async (page = 1, limit = 10) => {
+    const skip = (page - 1) * limit;
     return await prisma.course.findMany({
+        skip,
+        take: limit,
         include: {
             teacher: {
                 select: { name: true }
@@ -33,8 +36,11 @@ export const getCourseById = async (id) => {
     });
 };
 
-export const getEnrolledCourses = async (studentId) => {
+export const getEnrolledCourses = async (studentId, page = 1, limit = 10) => {
+    const skip = (page - 1) * limit;
     return await prisma.course.findMany({
+        skip,
+        take: limit,
         where: {
             enrollments: {
                 some: {
