@@ -86,6 +86,9 @@ RATE_LIMIT_REGISTER_MAX=10
 cd backend/
 npm install
 
+# Generate the Prisma Client
+npm run prisma:generate
+
 # Apply database migrations
 npx prisma migrate dev
 
