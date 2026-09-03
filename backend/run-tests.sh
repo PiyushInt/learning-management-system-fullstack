@@ -12,6 +12,8 @@ done;
 export DATABASE_URL="postgresql://testuser:testpassword@localhost:5434/testdb"
 export JWT_SECRET="test_secret_for_tests_must_be_32_bytes_long"
 export NODE_ENV="test"
+export RATE_LIMIT_LOGIN_MAX=3
+export RATE_LIMIT_REGISTER_MAX=100
 
 echo "Running migrations..."
 npx prisma migrate deploy --config=../database/prisma.config.ts --schema=../database/prisma/schema.prisma

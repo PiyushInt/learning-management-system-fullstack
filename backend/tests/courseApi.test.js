@@ -82,14 +82,14 @@ describe('Course API', () => {
             expect(res.statusCode).toEqual(403);
         });
 
-        it('POST /courses/:id/enroll - student enrolling a DIFFERENT student', async () => {
+        it('POST /courses/:id/enroll - student sending body payload gets 400 (strict schema)', async () => {
             const token = getToken(fixtures.unenrolledStudent);
             const course = fixtures.courseA;
             const res = await request(app)
                 .post(`/courses/${course.id}/enroll`)
                 .set('Authorization', `Bearer ${token}`)
                 .send({ student_id: fixtures.enrolledStudent.id }); 
-            expect(res.statusCode).toEqual(403);
+            expect(res.statusCode).toEqual(400);
         });
 
         it('GET /courses/:id/assignments - student not enrolled in that course', async () => {

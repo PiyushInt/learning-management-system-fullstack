@@ -5,13 +5,13 @@ import { fixtures, reseed, getToken } from './fixtures.js';
 describe('No Body Tests', () => {
     beforeAll(async () => await reseed());
 
-    it.skip('[Phase 7] POST /assignments/:id/submit with no body returns 400', async () => {
+    it('[Phase 7] POST /assignments/:id/submit with no body returns 400', async () => {
         const token = getToken(fixtures.enrolledStudent);
         const res = await request(app).post(`/assignments/${fixtures.assignmentA.id}/submit`).set('Authorization', `Bearer ${token}`);
         expect(res.statusCode).toBe(400);
     });
 
-    it.skip('[Phase 7] POST /courses with no body returns 400', async () => {
+    it('[Phase 7] POST /courses with no body returns 400', async () => {
         const token = getToken(fixtures.teacherA);
         const res = await request(app).post('/courses').set('Authorization', `Bearer ${token}`);
         expect(res.statusCode).toBe(400);

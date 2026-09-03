@@ -1,4 +1,5 @@
 import { config } from '../config/index.js';
+import logger from './logger.js';
 
 export const errorHandler = (err, req, res, next) => {
     let statusCode = err.statusCode || 500;
@@ -14,9 +15,9 @@ export const errorHandler = (err, req, res, next) => {
     
     // Log unexpected errors fully in production, and all errors fully in development
     if (isDevelopment) {
-        console.error(err.stack);
+        logger.error({ message: err.message, stack: err.stack, reqId: req.id });
     } else if (!err.isOperational) {
-        console.error(`[UNEXPECTED ERROR - ${req.id}]`, err.stack);
+        logger.error({ message: 'UNEXPECTED ERROR', stack: err.stack, reqId: req.id });
     }
 
     res.status(statusCode).json({

@@ -1,5 +1,6 @@
 import prisma from '../src/utils/prisma.js';
 import { signToken } from '../src/utils/auth.js';
+import { loginLimiter, registerLimiter } from '../src/routes/authRoutes.js';
 
 export const fixtures = {};
 
@@ -14,6 +15,12 @@ export const truncateDb = async () => {
 };
 
 export const reseed = async () => {
+    // Reset rate limiters for test IPs
+    loginLimiter.resetKey('::ffff:127.0.0.1');
+    loginLimiter.resetKey('127.0.0.1');
+    registerLimiter.resetKey('::ffff:127.0.0.1');
+    registerLimiter.resetKey('127.0.0.1');
+
     await truncateDb();
     
     // Create users

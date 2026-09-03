@@ -1,5 +1,5 @@
 import prisma from '../utils/prisma.js';
-import { assertOwnsCourse, assertEnrolled } from './courseService.js';
+import { assertOwnsCourse, assertEnrolled } from '../core/authorization.js';
 import { AppError } from '../core/errors.js';
 
 export const submitAssignment = async (assignmentId, studentId, content) => {

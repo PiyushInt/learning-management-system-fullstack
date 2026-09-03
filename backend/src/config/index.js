@@ -9,7 +9,9 @@ const envSchema = Joi.object({
     DATABASE_URL: Joi.string().required(),
     JWT_SECRET: Joi.string().required(),
     JWT_EXPIRES_IN: Joi.string().default('1d'),
-    CORS_ORIGIN: Joi.string()
+    CORS_ORIGIN: Joi.string(),
+    RATE_LIMIT_LOGIN_MAX: Joi.number().default(5),
+    RATE_LIMIT_REGISTER_MAX: Joi.number().default(10)
 }).unknown(true);
 
 const { error, value: envVars } = envSchema.validate(process.env, { abortEarly: false });
@@ -36,5 +38,9 @@ export const config = {
     jwt: {
         secret: envVars.JWT_SECRET,
         expiresIn: envVars.JWT_EXPIRES_IN
+    },
+    rateLimit: {
+        loginMax: envVars.RATE_LIMIT_LOGIN_MAX,
+        registerMax: envVars.RATE_LIMIT_REGISTER_MAX
     }
 };

@@ -5,9 +5,9 @@ export const registerSchema = Joi.object({
     email: Joi.string().email().required(),
     password: Joi.string().min(6).required(),
     role: Joi.string().valid('TEACHER', 'STUDENT').required()
-});
+}).options({ stripUnknown: false, allowUnknown: false });
 
 export const loginSchema = Joi.object({
     email: Joi.string().email().required(),
     password: Joi.string().required()
-});
+}).options({ stripUnknown: false, allowUnknown: false });
