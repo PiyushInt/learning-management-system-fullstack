@@ -1,6 +1,8 @@
 node_modules
 .env
-database/
 backend/node_modules
 frontend/node_modules
 .DS_Store
+database/node_modules
+database/*.db
+database/*.sqlite
