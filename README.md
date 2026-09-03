@@ -1,19 +1,20 @@
 # Mini LMS (Learning Management System) Backend
+
 [![CI Pipeline](https://github.com/PiyushInt/learning-management-system-fullstack/actions/workflows/ci.yml/badge.svg)](https://github.com/PiyushInt/learning-management-system-fullstack/actions/workflows/ci.yml)
 
 An advanced, resilient, and secure RESTful API for a Learning Management System designed to handle core educational workflows: course creation, student enrollment, assignment distribution, and grade-less submission tracking.
 
 ## Overview
-This backend powers a multi-tenant learning environment where Teachers manage courses and assignments, and Students enroll in those courses and submit their work. It heavily emphasizes security boundaries, rate-limiting resilience, and strict data consistency logic utilizing modern Node.js backend practices.
+This backend powers a multi-tenant learning environment where Teachers manage courses and assignments, and Students enroll in those courses and submit their work. It heavily emphasizes security boundaries, rate-limiting resilience, strict data consistency logic, and robust automated testing utilizing modern Node.js backend practices.
 
 ## Tech Stack
-* **Language & Runtime:** Node.js (v20), ES Modules
+* **Language & Runtime:** Node.js (v20+), ES Modules
 * **Framework:** Express.js (v5)
 * **Database & ORM:** PostgreSQL (v15), Prisma ORM
 * **Security & Hardening:** Helmet, express-rate-limit, CORS, bcrypt, Joi
 * **Observability:** Winston (Structured logging, Recursive redaction)
 * **Testing:** Jest, Supertest
-* **CI/CD:** GitHub Actions (Clean-clone DB migration tests)
+* **CI/CD:** GitHub Actions (Clean-clone DB migration tests, Linting, Audit)
 
 ## Architecture
 
@@ -47,17 +48,18 @@ backend/
 │   ├── server.js            # Entry point & Graceful shutdown
 │   ├── config/              # Centralized environment variable parsing
 │   ├── controllers/         # HTTP request/response handlers
-│   ├── core/                # Core domain logic (e.g., authorization.js)
+│   ├── core/                # Core domain logic (authorization.js)
 │   ├── middlewares/         # Joi validation, error handling, logging, JWT auth
 │   ├── routes/              # Route definitions
 │   ├── services/            # Business logic and Prisma DB interactions
 │   ├── utils/               # Helpers (e.g., JWT signing/verification)
 │   └── validations/         # Joi schema definitions
 ├── tests/                   # Jest integration test suite & fixtures
-├── database/                # Prisma schema, migrations, config
-├── .github/workflows/       # CI/CD pipelines
+├── prisma/                  # Prisma schema and migrations
+├── .env.example             # Template for environment variables
 ├── package.json             # NPM dependencies & scripts
 └── eslint.config.js         # Linter configuration
+.github/workflows/           # CI/CD pipelines
 ```
 
 ## Getting Started
@@ -71,26 +73,25 @@ backend/
 Create a `.env` file in the `backend/` directory:
 
 ```env
-NODE_ENV=development
 PORT=3000
-DATABASE_URL=postgresql://lmsuser:lmspassword@localhost:5432/lmsdb
-JWT_SECRET=super_secret_jwt_key_that_is_at_least_32_bytes_long
-JWT_EXPIRES_IN=1d
-CORS_ORIGIN=http://localhost:3000
-RATE_LIMIT_LOGIN_MAX=5
-RATE_LIMIT_REGISTER_MAX=10
+DATABASE_URL="postgresql://user:password@localhost:5432/dbname"
+JWT_SECRET="replace_with_a_secure_random_string"
+JWT_EXPIRES_IN="1d"
 ```
+*(Note: A test database configuration is automatically managed via the `run-tests.sh` script when running `npm test`.)*
 
 ### Installation & Execution
 ```bash
 cd backend/
-npm install
+
+# Install dependencies using ci for exact lockfile match
+npm ci
 
 # Generate the Prisma Client
 npm run prisma:generate
 
 # Apply database migrations
-npx prisma migrate dev
+npm run prisma:migrate
 
 # Start the server (Development)
 npm run dev
@@ -122,25 +123,43 @@ npm run dev
 
 ## Security
 
-This system implements a defense-in-depth security architecture:
+This system implements a strict defense-in-depth security architecture with a clear separation of concerns:
 
-1. **Strict Boundary Validation**: All incoming requests pass through a global `validateBody` middleware using strict Joi schemas (`stripUnknown: false`, `allowUnknown: false`), dropping malformed payloads before they reach business logic.
-2. **Rate Limiting**: Authentication endpoints are heavily protected against brute-force attacks via memory-stored rate limiters (`trust proxy` enabled).
-3. **Recursive Log Redaction**: The Winston logger utilizes a recursive object traversal function to guarantee `password`, `token`, and `authorization` keys are redacted (`[REDACTED]`), regardless of how deeply nested they are within request payloads or error stacks.
-4. **Isolated Authorization (`core/authorization.js`)**: Authorization is strictly split from authentication. Role checks are handled via the JWT middleware, but **ownership** (`assertOwnsCourse`) and **enrollment** (`assertEnrolled`) domain checks are abstracted into an isolated `core/authorization.js` module. This guarantees that standard Prisma queries always wrap the required database lookups to verify a Teacher actually owns the course they are modifying, or a Student is genuinely enrolled in the course they are interacting with.
+1. **Role Checks vs. Ownership Checks**: 
+   - **Role Checks** are performed early at the HTTP boundary via the JWT middleware (e.g., verifying a user is a `TEACHER` before allowing access to course creation).
+   - **Ownership & Domain Guards** live deeper in the stack within `src/core/authorization.js`. This module strictly handles data-level authorization, ensuring that a standard Prisma query always verifies a Teacher actually owns the course they are modifying, or a Student is genuinely enrolled in the course they are interacting with.
+
+2. **Route Coverage Matrix**:
+
+| Route | Role Check (Middleware) | Ownership / Domain Check (`authorization.js`) |
+| :--- | :--- | :--- |
+| `/auth/register` | None | None |
+| `/auth/login` | None | None |
+| `GET /courses` | None | None |
+| `POST /courses` | `TEACHER` | None |
+| `GET /courses/enrolled` | `STUDENT` | None |
+| `POST /courses/:id/enroll` | `STUDENT` | Implicit (creates enrollment) |
+| `GET /courses/:id/assignments` | `STUDENT` or `TEACHER` | `assertEnrolled` (Student) OR `assertOwnsCourse` (Teacher) |
+| `POST /courses/:id/assignments`| `TEACHER` | `assertOwnsCourse` |
+| `POST /assignments/:id/submit` | `STUDENT` | `assertEnrolled` (via Course) |
+| `GET /assignments/:id/submissions`| `TEACHER`| `assertOwnsCourse` (via Course) |
+
+3. **Strict Boundary Validation**: All incoming requests pass through a global `validateBody` middleware using strict Joi schemas, dropping malformed payloads before they reach business logic.
+4. **Recursive Log Redaction**: The Winston logger utilizes a recursive object traversal function to guarantee PII (`password`, `token`, etc.) is redacted (`[REDACTED]`), regardless of nesting depth.
 
 ## Testing
 The repository maintains strict integration test coverage spanning the full API boundary, database constraint validation, rate limiting, and log redaction.
 
 ```bash
-# Run the full test suite (automatically spins up a clean Postgres container)
+# Run the full test suite (automatically spins up a clean Postgres container on port 5434)
 npm test
 ```
 
 ## Design Decisions
-- **Hard Delete cascades**: `onDelete: Cascade` rules were implemented strictly across the schema. A course serves as a container; deleting a course destroys its assignments and submissions. However, deleting a user is restricted if they have graded submissions, preserving historical academic integrity.
+- **Hard Delete cascades**: `onDelete: Cascade` rules were implemented strictly across the schema. A course serves as a container; deleting a course destroys its assignments and submissions.
 - **UUIDs and API Coercion**: A dedicated integer coercion middleware shields the database from Prisma's `NaN` panics.
 - **Graceful Shutdown & Resilience**: The application leverages `SIGTERM`/`SIGINT` traps and explicitly delays startup until the database emits a successful connection ping.
+- **Audit Exception (`deepmerge-ts`, `mysql2`)**: The `npm audit` step currently returns advisory warnings for high-severity findings related to `deepmerge-ts` and `mysql2`. These are transitive dependencies of the Prisma CLI. Since this project strictly uses PostgreSQL, the `mysql2` vulnerability is unreachable at runtime. Resolving these warnings would require a breaking downgrade of Prisma. The audit step remains advisory (non-blocking) as no runtime risk is present.
 
 ## Limitations
 - **No Frontend**: This repository is strictly a backend API. The GitHub Actions CI pipeline verifies backend linting, database migrations from scratch, and integration tests, but intentionally does not build or assert UI artifacts.
