@@ -6,3 +6,6 @@ frontend/node_modules
 database/node_modules
 database/*.db
 database/*.sqlite
+task.md
+implementation_plan.md
+walkthrough.md
