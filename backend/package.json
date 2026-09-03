@@ -11,9 +11,9 @@
     "lint": "eslint src tests",
     "lint:fix": "eslint src tests --fix",
     "format": "prettier --write \"src/**/*.js\" \"tests/**/*.js\"",
-    "prisma:generate": "prisma generate --schema=../database/prisma/schema.prisma",
-    "prisma:migrate": "prisma migrate dev --schema=../database/prisma/schema.prisma",
-    "prisma:studio": "prisma studio --schema=../database/prisma/schema.prisma"
+    "prisma:generate": "prisma generate",
+    "prisma:migrate": "prisma migrate dev",
+    "prisma:studio": "prisma studio"
   },
   "dependencies": {
     "@prisma/adapter-pg": "^7.3.0",

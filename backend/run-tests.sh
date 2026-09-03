@@ -16,7 +16,7 @@ export RATE_LIMIT_LOGIN_MAX=3
 export RATE_LIMIT_REGISTER_MAX=5
 
 echo "Running migrations..."
-npx prisma migrate deploy --schema=../database/prisma/schema.prisma
+npx prisma migrate deploy
 
 echo "Running tests..."
 node --experimental-vm-modules node_modules/jest/bin/jest.js --runInBand --detectOpenHandles "$@"
