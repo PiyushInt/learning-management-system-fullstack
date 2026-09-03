@@ -4,6 +4,7 @@ const API_URL = import.meta.env.VITE_API_URL || '/api';
 
 const api = axios.create({
   baseURL: API_URL,
+  timeout: 30000,
   headers: {
     'Content-Type': 'application/json',
   },
@@ -27,12 +28,21 @@ api.interceptors.request.use(
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response && error.response.status === 401) {
-      // Token expired or invalid
-      localStorage.removeItem('token');
-      localStorage.removeItem('user');
-      // Optional: Redirect to login
-      window.location.href = '/login';
+    if (error.response) {
+      if (error.response.status === 401) {
+        // Token expired or invalid
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        // Optional: Redirect to login
+        window.location.href = '/login';
+      }
+      
+      const apiError = error.response.data?.error?.message 
+        || error.response.data?.message 
+        || 'An unexpected error occurred';
+      error.message = apiError;
+    } else {
+      error.message = 'Network error or server unreachable';
     }
     return Promise.reject(error);
   }

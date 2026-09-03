@@ -7,7 +7,7 @@ export const fetchCourses = createAsyncThunk(
         try {
             return await courseService.getAllCourses();
         } catch (error) {
-            return rejectWithValue(error.response?.data?.error || 'Failed to fetch courses');
+            return rejectWithValue(error.message || 'Failed to fetch courses');
         }
     }
 );
@@ -18,7 +18,7 @@ export const fetchEnrolledCourses = createAsyncThunk(
         try {
             return await courseService.getEnrolledCourses();
         } catch (error) {
-            return rejectWithValue(error.response?.data?.error || 'Failed to fetch enrolled courses');
+            return rejectWithValue(error.message || 'Failed to fetch enrolled courses');
         }
     }
 );
@@ -29,7 +29,7 @@ export const createNewCourse = createAsyncThunk(
         try {
             return await courseService.createCourse(courseData);
         } catch (error) {
-            return rejectWithValue(error.response?.data?.error || 'Failed to create course');
+            return rejectWithValue(error.message || 'Failed to create course');
         }
     }
 );
@@ -40,7 +40,7 @@ export const enrollInCourse = createAsyncThunk(
         try {
             return await courseService.enrollStudent(courseId);
         } catch (error) {
-            return rejectWithValue(error.response?.data?.error || 'Failed to enroll');
+            return rejectWithValue(error.message || 'Failed to enroll');
         }
     }
 );

@@ -8,7 +8,7 @@ export const fetchAssignments = createAsyncThunk(
         try {
             return await courseService.getCourseAssignments(courseId);
         } catch (error) {
-            return rejectWithValue(error.response?.data?.error || 'Failed to fetch assignments');
+            return rejectWithValue(error.message || 'Failed to fetch assignments');
         }
     }
 );
@@ -20,7 +20,7 @@ export const createAssignment = createAsyncThunk(
             const response = await api.post(`/courses/${courseId}/assignments`, assignmentData);
             return response.data;
         } catch (error) {
-            return rejectWithValue(error.response?.data?.error || 'Failed to create assignment');
+            return rejectWithValue(error.message || 'Failed to create assignment');
         }
     }
 );
@@ -32,7 +32,7 @@ export const submitAssignment = createAsyncThunk(
             const response = await api.post(`/assignments/${assignmentId}/submit`, { content });
             return response.data;
         } catch (error) {
-            return rejectWithValue(error.response?.data?.error || 'Failed to submit assignment');
+            return rejectWithValue(error.message || 'Failed to submit assignment');
         }
     }
 );
@@ -44,7 +44,7 @@ export const fetchSubmissions = createAsyncThunk(
             const response = await api.get(`/assignments/${assignmentId}/submissions`);
             return { assignmentId, submissions: response.data };
         } catch (error) {
-            return rejectWithValue(error.response?.data?.error || 'Failed to fetch submissions');
+            return rejectWithValue(error.message || 'Failed to fetch submissions');
         }
     }
 );

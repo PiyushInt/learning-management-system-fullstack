@@ -40,7 +40,11 @@ const CourseDetail = () => {
 
     const handleCreate = async (e) => {
         e.preventDefault();
-        await dispatch(createAssignment({ courseId: id, assignmentData: newAssignment }));
+        let formattedDate = newAssignment.due_date;
+        if (formattedDate && !formattedDate.includes('T')) {
+            formattedDate = `${formattedDate}T23:59:59.999Z`;
+        }
+        await dispatch(createAssignment({ courseId: id, assignmentData: { ...newAssignment, due_date: formattedDate } }));
         setShowCreateModal(false);
         setNewAssignment({ title: '', description: '', due_date: '' });
     };
