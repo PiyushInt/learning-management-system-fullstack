@@ -45,13 +45,10 @@ jobs:
         working-directory: ./backend
         run: npm ci
 
-      - name: Install Database Dependencies
-        working-directory: ./database
-        run: npm install dotenv
 
       - name: Run Prisma Migrations
         working-directory: ./backend
-        run: npx prisma migrate deploy --config=../database/prisma.config.ts --schema=../database/prisma/schema.prisma
+        run: npx prisma migrate deploy --schema=../database/prisma/schema.prisma
 
       - name: Run Linter
         working-directory: ./backend
