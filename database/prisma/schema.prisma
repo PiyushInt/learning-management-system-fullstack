@@ -79,7 +79,7 @@ model Submission {
   submitted_at  DateTime         @default(now())
 
   assignment    Assignment       @relation(fields: [assignment_id], references: [id], onDelete: Cascade)
-  student       User             @relation(fields: [student_id], references: [id], onDelete: Restrict)
+  student       User             @relation(fields: [student_id], references: [id], onDelete: Cascade)
 
   @@unique([assignment_id, student_id])
 }

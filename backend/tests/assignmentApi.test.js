@@ -65,5 +65,38 @@ describe('Assignment API', () => {
             // One should succeed, one should fail with 409
             expect(statuses).toEqual([201, 409]);
         });
+
+        it('POST /assignments/:id/submit - submitting after due_date is rejected', async () => {
+            const token = getToken(fixtures.enrolledStudent);
+            
+            // Create a past assignment directly in DB
+            const pastAssignment = await prisma.assignment.create({
+                data: {
+                    course_id: fixtures.courseA.id,
+                    title: 'Past Assignment',
+                    due_date: new Date(Date.now() - 86400000) // 1 day ago
+                }
+            });
+
+            const res = await request(app)
+                .post(`/assignments/${pastAssignment.id}/submit`)
+                .set('Authorization', `Bearer ${token}`)
+                .send({ content: 'Late submission' });
+
+            expect(res.statusCode).toEqual(400); // 400 Bad Request
+        });
+
+        it('POST /courses/:id/assignments - creating assignment with past due_date is rejected', async () => {
+            const token = getToken(fixtures.teacherA);
+            const course = fixtures.courseA;
+            const pastDate = new Date(Date.now() - 86400000).toISOString(); // 1 day ago
+
+            const res = await request(app)
+                .post(`/courses/${course.id}/assignments`)
+                .set('Authorization', `Bearer ${token}`)
+                .send({ title: 'Invalid Assignment', due_date: pastDate });
+
+            expect(res.statusCode).toEqual(400); // 400 Bad Request
+        });
     });
 });

@@ -27,8 +27,8 @@ export const reseed = async () => {
     fixtures.courseB = await prisma.course.create({ data: { title: 'Course B', teacher_id: fixtures.teacherB.id } });
     
     // Create assignments
-    fixtures.assignmentA = await prisma.assignment.create({ data: { course_id: fixtures.courseA.id, title: 'Asg A', due_date: new Date() } });
-    fixtures.assignmentB = await prisma.assignment.create({ data: { course_id: fixtures.courseB.id, title: 'Asg B', due_date: new Date() } });
+    fixtures.assignmentA = await prisma.assignment.create({ data: { course_id: fixtures.courseA.id, title: 'Asg A', due_date: new Date(Date.now() + 86400000) } });
+    fixtures.assignmentB = await prisma.assignment.create({ data: { course_id: fixtures.courseB.id, title: 'Asg B', due_date: new Date(Date.now() + 86400000) } });
     
     // Create enrollment
     await prisma.enrollment.create({ data: { student_id: fixtures.enrolledStudent.id, course_id: fixtures.courseA.id } });

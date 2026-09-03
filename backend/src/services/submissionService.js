@@ -9,6 +9,10 @@ export const submitAssignment = async (assignmentId, studentId, content) => {
     });
     if (!assignment) throw new AppError('Assignment not found', 404, 'NOT_FOUND');
 
+    if (assignment.due_date && new Date() > assignment.due_date) {
+        throw new AppError('Assignment is past its due date', 400, 'BAD_REQUEST');
+    }
+
     await assertEnrolled(studentId, assignment.course_id);
 
     // Check if already submitted

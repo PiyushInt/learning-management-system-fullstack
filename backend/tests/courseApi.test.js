@@ -60,7 +60,7 @@ describe('Course API', () => {
 
     describe('GET /courses/:id/assignments', () => {
         it('should return 401 if no token is provided', async () => {
-            const courseId = 'some-course-id'; // ID doesn't matter, auth should reject first
+            const courseId = 1; // Use valid ID so validation passes and auth is tested
             const res = await request(app)
                 .get(`/courses/${courseId}/assignments`);
 
@@ -108,6 +108,32 @@ describe('Course API', () => {
                 .get(`/courses/${course.id}/assignments`)
                 .set('Authorization', `Bearer ${token}`);
             expect(res.statusCode).toEqual(200);
+        });
+        it('POST /courses/:id/enroll - enrolledStudent double-enrolling produces exactly one 201 and one 409', async () => {
+            const token = getToken(fixtures.enrolledStudent);
+            const course = fixtures.courseB;
+
+            const req1 = request(app)
+                .post(`/courses/${course.id}/enroll`)
+                .set('Authorization', `Bearer ${token}`);
+                
+            const req2 = request(app)
+                .post(`/courses/${course.id}/enroll`)
+                .set('Authorization', `Bearer ${token}`);
+                
+            const [res1, res2] = await Promise.all([req1, req2]);
+            const statuses = [res1.statusCode, res2.statusCode].sort();
+            
+            expect(statuses).toEqual([201, 409]);
+        });
+
+        it('POST /courses/:id/enroll - teacher cannot enroll as student', async () => {
+            const token = getToken(fixtures.teacherB);
+            const course = fixtures.courseA;
+            const res = await request(app)
+                .post(`/courses/${course.id}/enroll`)
+                .set('Authorization', `Bearer ${token}`);
+            expect(res.statusCode).toEqual(403);
         });
     });
 });
