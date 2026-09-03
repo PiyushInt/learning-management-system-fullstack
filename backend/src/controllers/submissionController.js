@@ -1,9 +1,8 @@
 import * as submissionService from '../services/submissionService.js';
-import { AppError } from '../core/errors.js';
+
 
 export const submitAssignment = async (req, res, next) => {
     try {
-
         const { id: assignmentId } = req.params;
         const { content } = req.body;
 

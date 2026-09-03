@@ -17,7 +17,7 @@ const envSchema = Joi.object({
 const { error, value: envVars } = envSchema.validate(process.env, { abortEarly: false });
 
 if (error) {
-    const missingVars = error.details.map(detail => detail.message).join('\n');
+    const missingVars = error.details.map((detail) => detail.message).join('\n');
     throw new Error(`Config validation error(s):\n${missingVars}`);
 }
 

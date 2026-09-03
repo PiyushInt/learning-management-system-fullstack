@@ -18,18 +18,22 @@ app.set('trust proxy', 1);
 app.use(express.json({ limit: '10kb' }));
 app.use(express.urlencoded({ extended: true, limit: '10kb' }));
 
-app.use(cors({
-    origin: config.corsOrigin,
-    methods: ['GET', 'POST', 'PUT', 'DELETE'],
-    allowedHeaders: ['Content-Type', 'Authorization']
-}));
+app.use(
+    cors({
+        origin: config.corsOrigin,
+        methods: ['GET', 'POST', 'PUT', 'DELETE'],
+        allowedHeaders: ['Content-Type', 'Authorization']
+    })
+);
 
-app.use(helmet({
-    contentSecurityPolicy: false, // Not needed for a pure JSON API
-    crossOriginEmbedderPolicy: false,
-    xPoweredBy: false,
-    hsts: { maxAge: 31536000, includeSubDomains: true, preload: true }
-}));
+app.use(
+    helmet({
+        contentSecurityPolicy: false, // Not needed for a pure JSON API
+        crossOriginEmbedderPolicy: false,
+        xPoweredBy: false,
+        hsts: { maxAge: 31536000, includeSubDomains: true, preload: true }
+    })
+);
 
 app.use((req, res, next) => {
     req.id = crypto.randomUUID();
@@ -37,11 +41,9 @@ app.use((req, res, next) => {
     next();
 });
 
-
 app.use('/auth', authRoutes);
 app.use('/courses', courseRoutes);
 app.use('/assignments', assignmentRoutes);
-
 
 app.get('/health', (req, res) => {
     res.status(200).json({ status: 'UP' });

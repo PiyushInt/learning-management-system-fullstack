@@ -77,5 +77,3 @@ export const enrollStudent = async (courseId, studentId) => {
         }
     });
 };
-
-

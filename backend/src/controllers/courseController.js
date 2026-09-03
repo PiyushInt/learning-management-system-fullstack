@@ -3,7 +3,6 @@ import { AppError } from '../core/errors.js';
 
 export const createCourse = async (req, res, next) => {
     try {
-
         const course = await courseService.createCourse(req.body, req.user.id);
         res.status(201).json(course);
     } catch (error) {

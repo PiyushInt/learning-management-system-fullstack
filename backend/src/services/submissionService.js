@@ -37,7 +37,7 @@ export const submitAssignment = async (assignmentId, studentId, content) => {
 export const getSubmissionsByAssignment = async (assignmentId, teacherId) => {
     const assignment = await prisma.assignment.findUnique({ where: { id: parseInt(assignmentId) } });
     if (!assignment) throw new AppError('Assignment not found', 404, 'NOT_FOUND');
-    
+
     await assertOwnsCourse(teacherId, assignment.course_id);
 
     return await prisma.submission.findMany({

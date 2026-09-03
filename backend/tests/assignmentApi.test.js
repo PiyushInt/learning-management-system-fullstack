@@ -46,29 +46,29 @@ describe('Assignment API', () => {
         it('POST /assignments/:id/submit - enrolledStudent double-submitting produces exactly one 201 and one 409', async () => {
             const token = getToken(fixtures.enrolledStudent);
             const assignment = fixtures.assignmentA;
-            
+
             // Fire both requests concurrently
             const req1 = request(app)
                 .post(`/assignments/${assignment.id}/submit`)
                 .set('Authorization', `Bearer ${token}`)
                 .send({ content: 'Concurrent submission A' });
-            
+
             const req2 = request(app)
                 .post(`/assignments/${assignment.id}/submit`)
                 .set('Authorization', `Bearer ${token}`)
                 .send({ content: 'Concurrent submission B' });
-                
+
             const [res1, res2] = await Promise.all([req1, req2]);
-            
+
             const statuses = [res1.statusCode, res2.statusCode].sort();
-            
+
             // One should succeed, one should fail with 409
             expect(statuses).toEqual([201, 409]);
         });
 
         it('POST /assignments/:id/submit - submitting after due_date is rejected', async () => {
             const token = getToken(fixtures.enrolledStudent);
-            
+
             // Create a past assignment directly in DB
             const pastAssignment = await prisma.assignment.create({
                 data: {

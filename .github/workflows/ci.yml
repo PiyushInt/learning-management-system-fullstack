@@ -1,0 +1,62 @@
+name: CI Pipeline
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_USER: testuser
+          POSTGRES_PASSWORD: testpassword
+          POSTGRES_DB: testdb
+        ports:
+          - 5434:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    env:
+      DATABASE_URL: postgresql://testuser:testpassword@localhost:5434/testdb
+      JWT_SECRET: super_secret_dummy_jwt_key_that_is_at_least_32_bytes
+      NODE_ENV: test
+      CORS_ORIGIN: http://localhost:3000
+      RATE_LIMIT_LOGIN_MAX: 3
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install Dependencies
+        working-directory: ./backend
+        run: npm ci
+
+      - name: Run Prisma Migrations
+        working-directory: ./backend
+        run: npx prisma migrate deploy --config=../database/prisma.config.ts --schema=../database/prisma/schema.prisma
+
+      - name: Run Linter
+        working-directory: ./backend
+        run: npm run lint
+
+      - name: Run Tests
+        working-directory: ./backend
+        run: npm run test:ci
+
+      - name: Run Audit
+        working-directory: ./backend
+        run: npm audit --audit-level=high

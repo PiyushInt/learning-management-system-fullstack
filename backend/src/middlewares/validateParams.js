@@ -11,7 +11,7 @@ export const validateParams = (schema) => {
         if (error) {
             return next(new AppError(`Invalid path parameter: ${error.details[0].message}`, 400, 'VALIDATION_ERROR'));
         }
-        
+
         // Coerce the valid param so controllers don't need to parseInt
         req.params.id = parseInt(req.params.id, 10);
         next();

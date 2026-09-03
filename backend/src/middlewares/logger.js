@@ -2,11 +2,7 @@ import winston from 'winston';
 
 const { combine, timestamp, printf, json, colorize } = winston.format;
 
-// Format to include req.id if provided via meta or explicitly
-const addReqId = winston.format((info) => {
-    // We expect req.id to be passed via meta or similar, but typically we attach it to the req object
-    return info;
-});
+
 
 // Recursive redaction for sensitive fields
 const redactFields = ['password', 'token', 'authorization'];
@@ -14,7 +10,7 @@ const redactFields = ['password', 'token', 'authorization'];
 const redactObj = (obj) => {
     if (!obj || typeof obj !== 'object') return obj;
     if (Array.isArray(obj)) {
-        return obj.map(item => redactObj(item));
+        return obj.map((item) => redactObj(item));
     }
     const redacted = { ...obj };
     for (const key in redacted) {
@@ -44,9 +40,7 @@ const logger = winston.createLogger({
         redactFormat(),
         process.env.NODE_ENV === 'production' ? json() : combine(colorize(), customFormat)
     ),
-    transports: [
-        new winston.transports.Console()
-    ],
+    transports: [new winston.transports.Console()]
 });
 
 export default logger;

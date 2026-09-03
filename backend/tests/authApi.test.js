@@ -15,28 +15,24 @@ describe('Auth API', () => {
 
     describe('POST /auth/register', () => {
         it('should register a user', async () => {
-            const res = await request(app)
-                .post('/auth/register')
-                .send({
-                    name: 'Integration User',
-                    email: 'integration@test.com',
-                    password: 'password123',
-                    role: 'TEACHER'
-                });
+            const res = await request(app).post('/auth/register').send({
+                name: 'Integration User',
+                email: 'integration@test.com',
+                password: 'password123',
+                role: 'TEACHER'
+            });
 
             expect(res.statusCode).toEqual(201);
             expect(res.body).toHaveProperty('token');
         });
-        
+
         it('should return 409 for duplicate email', async () => {
-            const res = await request(app)
-                .post('/auth/register')
-                .send({
-                    name: 'Teacher A Clone',
-                    email: 'ta@test.com', // This email is seeded in fixtures
-                    password: 'password123',
-                    role: 'TEACHER'
-                });
+            const res = await request(app).post('/auth/register').send({
+                name: 'Teacher A Clone',
+                email: 'ta@test.com', // This email is seeded in fixtures
+                password: 'password123',
+                role: 'TEACHER'
+            });
 
             expect(res.statusCode).toEqual(409);
             expect(res.body.error).toHaveProperty('code', 'EMAIL_ALREADY_EXISTS');

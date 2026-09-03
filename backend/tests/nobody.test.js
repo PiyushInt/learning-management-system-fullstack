@@ -7,7 +7,9 @@ describe('No Body Tests', () => {
 
     it('[Phase 7] POST /assignments/:id/submit with no body returns 400', async () => {
         const token = getToken(fixtures.enrolledStudent);
-        const res = await request(app).post(`/assignments/${fixtures.assignmentA.id}/submit`).set('Authorization', `Bearer ${token}`);
+        const res = await request(app)
+            .post(`/assignments/${fixtures.assignmentA.id}/submit`)
+            .set('Authorization', `Bearer ${token}`);
         expect(res.statusCode).toBe(400);
     });
 

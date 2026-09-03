@@ -43,7 +43,7 @@ describe('Cascade Behaviors', () => {
         // Assert submissions are gone
         const submissions = await prisma.submission.findMany({});
         expect(submissions.length).toBe(0);
-        
+
         // Assert assignment is gone
         const assignments = await prisma.assignment.findMany({});
         expect(assignments.length).toBe(0);

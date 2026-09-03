@@ -17,19 +17,16 @@ describe('Course API', () => {
         it('should return 200 and the enrolled courses for an authenticated student', async () => {
             const token = getToken(fixtures.enrolledStudent);
 
-            const res = await request(app)
-                .get('/courses/enrolled')
-                .set('Authorization', `Bearer ${token}`);
+            const res = await request(app).get('/courses/enrolled').set('Authorization', `Bearer ${token}`);
 
             expect(res.statusCode).toEqual(200);
             expect(Array.isArray(res.body)).toBe(true);
             expect(res.body.length).toBe(1);
             expect(res.body[0].title).toBe('Course A');
         });
-        
+
         it('should return 401 if no token is provided', async () => {
-            const res = await request(app)
-                .get('/courses/enrolled');
+            const res = await request(app).get('/courses/enrolled');
 
             expect(res.statusCode).toEqual(401);
             expect(res.body.error).toHaveProperty('code', 'UNAUTHORIZED');
@@ -41,7 +38,7 @@ describe('Course API', () => {
             const res = await request(app).get('/courses');
             expect(res.statusCode).toEqual(200);
             expect(Array.isArray(res.body)).toBe(true);
-            
+
             // Should not expose teacher email
             if (res.body.length > 0) {
                 expect(res.body[0].teacher.email).toBeUndefined();
@@ -61,8 +58,7 @@ describe('Course API', () => {
     describe('GET /courses/:id/assignments', () => {
         it('should return 401 if no token is provided', async () => {
             const courseId = 1; // Use valid ID so validation passes and auth is tested
-            const res = await request(app)
-                .get(`/courses/${courseId}/assignments`);
+            const res = await request(app).get(`/courses/${courseId}/assignments`);
 
             expect(res.statusCode).toEqual(401);
             expect(res.body.error).toHaveProperty('code', 'UNAUTHORIZED');
@@ -88,7 +84,7 @@ describe('Course API', () => {
             const res = await request(app)
                 .post(`/courses/${course.id}/enroll`)
                 .set('Authorization', `Bearer ${token}`)
-                .send({ student_id: fixtures.enrolledStudent.id }); 
+                .send({ student_id: fixtures.enrolledStudent.id });
             expect(res.statusCode).toEqual(400);
         });
 
@@ -113,26 +109,20 @@ describe('Course API', () => {
             const token = getToken(fixtures.enrolledStudent);
             const course = fixtures.courseB;
 
-            const req1 = request(app)
-                .post(`/courses/${course.id}/enroll`)
-                .set('Authorization', `Bearer ${token}`);
-                
-            const req2 = request(app)
-                .post(`/courses/${course.id}/enroll`)
-                .set('Authorization', `Bearer ${token}`);
-                
+            const req1 = request(app).post(`/courses/${course.id}/enroll`).set('Authorization', `Bearer ${token}`);
+
+            const req2 = request(app).post(`/courses/${course.id}/enroll`).set('Authorization', `Bearer ${token}`);
+
             const [res1, res2] = await Promise.all([req1, req2]);
             const statuses = [res1.statusCode, res2.statusCode].sort();
-            
+
             expect(statuses).toEqual([201, 409]);
         });
 
         it('POST /courses/:id/enroll - teacher cannot enroll as student', async () => {
             const token = getToken(fixtures.teacherB);
             const course = fixtures.courseA;
-            const res = await request(app)
-                .post(`/courses/${course.id}/enroll`)
-                .set('Authorization', `Bearer ${token}`);
+            const res = await request(app).post(`/courses/${course.id}/enroll`).set('Authorization', `Bearer ${token}`);
             expect(res.statusCode).toEqual(403);
         });
     });

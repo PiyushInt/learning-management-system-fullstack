@@ -1,9 +1,8 @@
 import * as assignmentService from '../services/assignmentService.js';
-import { AppError } from '../core/errors.js';
+
 
 export const createAssignment = async (req, res, next) => {
     try {
-
         const { id: courseId } = req.params;
         const assignment = await assignmentService.createAssignment(courseId, req.body, req.user.id);
         res.status(201).json(assignment);

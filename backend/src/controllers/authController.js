@@ -1,9 +1,8 @@
 import * as authService from '../services/authService.js';
-import { AppError } from '../core/errors.js';
+
 
 export const register = async (req, res, next) => {
     try {
-
         const result = await authService.registerUser(req.body);
 
         res.status(201).json({
@@ -17,7 +16,6 @@ export const register = async (req, res, next) => {
 
 export const login = async (req, res, next) => {
     try {
-
         const result = await authService.loginUser(req.body);
 
         res.json({

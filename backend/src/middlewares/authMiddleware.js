@@ -13,7 +13,7 @@ export const authenticateToken = (req, res, next) => {
         const user = verifyToken(token);
         req.user = user;
         next();
-    } catch (error) {
+    } catch {
         return next(new AppError('Invalid token.', 403, 'FORBIDDEN'));
     }
 };
@@ -26,4 +26,3 @@ export const authorizeRole = (...roles) => {
         next();
     };
 };
-

@@ -8,7 +8,20 @@ import { submitAssignmentSchema } from '../validations/submissionValidation.js';
 
 const router = express.Router();
 
-router.post('/:id/submit', validateParams(idParamSchema), authenticateToken, authorizeRole('STUDENT'), validateBody(submitAssignmentSchema), submitAssignment);
-router.get('/:id/submissions', validateParams(idParamSchema), authenticateToken, authorizeRole('TEACHER'), getSubmissions);
+router.post(
+    '/:id/submit',
+    validateParams(idParamSchema),
+    authenticateToken,
+    authorizeRole('STUDENT'),
+    validateBody(submitAssignmentSchema),
+    submitAssignment
+);
+router.get(
+    '/:id/submissions',
+    validateParams(idParamSchema),
+    authenticateToken,
+    authorizeRole('TEACHER'),
+    getSubmissions
+);
 
 export default router;

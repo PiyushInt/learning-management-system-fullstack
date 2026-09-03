@@ -18,7 +18,10 @@ export const loginLimiter = rateLimit({
 export const registerLimiter = rateLimit({
     windowMs: 60 * 60 * 1000,
     max: config.rateLimit.registerMax,
-    message: { error: 'TOO_MANY_REQUESTS', message: 'Too many accounts created from this IP, please try again after an hour' }
+    message: {
+        error: 'TOO_MANY_REQUESTS',
+        message: 'Too many accounts created from this IP, please try again after an hour'
+    }
 });
 
 router.post('/register', registerLimiter, validateBody(registerSchema), register);

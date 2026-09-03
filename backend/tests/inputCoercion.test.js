@@ -13,7 +13,7 @@ describe('Input Coercion All Routes', () => {
         ['POST', '/assignments/:id/submit', 'STUDENT'],
         ['GET', '/assignments/:id/submissions', 'TEACHER']
     ];
-    
+
     const inputs = ['abc', '-1', '999999999999', '0'];
 
     for (const [method, route, role] of routes) {
