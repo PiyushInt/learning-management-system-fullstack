@@ -1,4 +1,5 @@
 import prisma from '../utils/prisma.js';
+import { AppError } from '../core/errors.js';
 
 export const createCourse = async (courseData, teacherId) => {
     const { title, description } = courseData;
@@ -60,7 +61,7 @@ export const enrollStudent = async (courseId, studentId) => {
     });
 
     if (existingEnrollment) {
-        throw new Error('Student already enrolled in this course.');
+        throw new AppError('Student already enrolled in this course.', 409, 'STUDENT_ALREADY_ENROLLED');
     }
 
     return await prisma.enrollment.create({

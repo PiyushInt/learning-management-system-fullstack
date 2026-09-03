@@ -1,10 +1,11 @@
 import * as submissionService from '../services/submissionService.js';
 import { submitAssignmentSchema } from '../validations/submissionValidation.js';
+import { AppError } from '../core/errors.js';
 
-export const submitAssignment = async (req, res) => {
+export const submitAssignment = async (req, res, next) => {
     try {
         const { error } = submitAssignmentSchema.validate(req.body);
-        if (error) return res.status(400).json({ error: error.details[0].message });
+        if (error) throw new AppError(error.details[0].message, 400, 'VALIDATION_ERROR');
 
         const { id: assignmentId } = req.params;
         const { content } = req.body;
@@ -12,17 +13,16 @@ export const submitAssignment = async (req, res) => {
         const submission = await submissionService.submitAssignment(assignmentId, req.user.id, content);
         res.status(201).json(submission);
     } catch (error) {
-        const status = error.message === 'Assignment already submitted' || error.message === 'Assignment not found' ? 400 : 500;
-        res.status(status).json({ error: error.message });
+        next(error);
     }
 };
 
-export const getSubmissions = async (req, res) => {
+export const getSubmissions = async (req, res, next) => {
     try {
         const { id: assignmentId } = req.params;
         const submissions = await submissionService.getSubmissionsByAssignment(assignmentId);
         res.json(submissions);
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        next(error);
     }
 };

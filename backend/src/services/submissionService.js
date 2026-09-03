@@ -1,11 +1,12 @@
 import prisma from '../utils/prisma.js';
+import { AppError } from '../core/errors.js';
 
 export const submitAssignment = async (assignmentId, studentId, content) => {
     // Check if assignment exists
     const assignment = await prisma.assignment.findUnique({
         where: { id: parseInt(assignmentId) }
     });
-    if (!assignment) throw new Error('Assignment not found');
+    if (!assignment) throw new AppError('Assignment not found', 404, 'NOT_FOUND');
 
     // Check if already submitted
     const existingSubmission = await prisma.submission.findFirst({
@@ -14,7 +15,7 @@ export const submitAssignment = async (assignmentId, studentId, content) => {
             student_id: studentId
         }
     });
-    if (existingSubmission) throw new Error('Assignment already submitted');
+    if (existingSubmission) throw new AppError('Assignment already submitted', 409, 'CONFLICT');
 
     return await prisma.submission.create({
         data: {

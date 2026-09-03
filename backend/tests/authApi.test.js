@@ -1,16 +1,20 @@
 import request from 'supertest';
 import app from '../src/app.js';
 import prisma from '../src/utils/prisma.js';
-
-// Note: These tests require a running database.
-// In a real CI environment, you would spin up a test DB or use a docker container.
+import { reseed, truncateDb } from './fixtures.js';
 
 describe('Auth API', () => {
-    // Skipping actual DB interaction in this environment
-    // Remove .skip to run with a real DB
+    beforeEach(async () => {
+        await reseed();
+    });
+
+    afterAll(async () => {
+        await truncateDb();
+        await prisma.$disconnect();
+    });
 
     describe('POST /auth/register', () => {
-        it.skip('should register a user', async () => {
+        it('should register a user', async () => {
             const res = await request(app)
                 .post('/auth/register')
                 .send({
@@ -22,6 +26,20 @@ describe('Auth API', () => {
 
             expect(res.statusCode).toEqual(201);
             expect(res.body).toHaveProperty('token');
+        });
+        
+        it('should return 409 for duplicate email', async () => {
+            const res = await request(app)
+                .post('/auth/register')
+                .send({
+                    name: 'Teacher A Clone',
+                    email: 'ta@test.com', // This email is seeded in fixtures
+                    password: 'password123',
+                    role: 'TEACHER'
+                });
+
+            expect(res.statusCode).toEqual(409);
+            expect(res.body.error).toHaveProperty('code', 'EMAIL_ALREADY_EXISTS');
         });
     });
 });

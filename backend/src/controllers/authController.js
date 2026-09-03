@@ -1,10 +1,11 @@
 import * as authService from '../services/authService.js';
 import { registerSchema, loginSchema } from '../validations/authValidation.js';
+import { AppError } from '../core/errors.js';
 
-export const register = async (req, res) => {
+export const register = async (req, res, next) => {
     try {
         const { error } = registerSchema.validate(req.body);
-        if (error) return res.status(400).json({ error: error.details[0].message });
+        if (error) throw new AppError(error.details[0].message, 400, 'VALIDATION_ERROR');
 
         const result = await authService.registerUser(req.body);
 
@@ -13,15 +14,14 @@ export const register = async (req, res) => {
             ...result
         });
     } catch (error) {
-        const status = error.message === 'Email already in use.' ? 400 : 500;
-        res.status(status).json({ error: error.message });
+        next(error);
     }
 };
 
-export const login = async (req, res) => {
+export const login = async (req, res, next) => {
     try {
         const { error } = loginSchema.validate(req.body);
-        if (error) return res.status(400).json({ error: error.details[0].message });
+        if (error) throw new AppError(error.details[0].message, 400, 'VALIDATION_ERROR');
 
         const result = await authService.loginUser(req.body);
 
@@ -30,7 +30,6 @@ export const login = async (req, res) => {
             ...result
         });
     } catch (error) {
-        const status = error.message === 'Invalid email or password.' ? 401 : 500;
-        res.status(status).json({ error: error.message });
+        next(error);
     }
 };
