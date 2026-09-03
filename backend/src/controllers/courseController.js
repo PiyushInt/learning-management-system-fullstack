@@ -47,6 +47,9 @@ export const getEnrolledCourses = async (req, res, next) => {
 
 export const enrollStudent = async (req, res, next) => {
     try {
+        if (req.body && req.body.student_id) {
+            throw new AppError('Providing student_id in the body is not allowed', 403, 'FORBIDDEN');
+        }
         const { id: courseId } = req.params;
         const enrollment = await courseService.enrollStudent(courseId, req.user.id);
         res.status(201).json({ message: 'Enrolled successfully', enrollment });

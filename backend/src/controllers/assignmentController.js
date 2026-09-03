@@ -8,7 +8,7 @@ export const createAssignment = async (req, res, next) => {
         if (error) throw new AppError(error.details[0].message, 400, 'VALIDATION_ERROR');
 
         const { id: courseId } = req.params;
-        const assignment = await assignmentService.createAssignment(courseId, req.body);
+        const assignment = await assignmentService.createAssignment(courseId, req.body, req.user.id);
         res.status(201).json(assignment);
     } catch (error) {
         next(error);
@@ -18,7 +18,7 @@ export const createAssignment = async (req, res, next) => {
 export const getAssignments = async (req, res, next) => {
     try {
         const { id: courseId } = req.params;
-        const assignments = await assignmentService.getAssignmentsByCourse(courseId);
+        const assignments = await assignmentService.getAssignmentsByCourse(courseId, req.user);
         res.json(assignments);
     } catch (error) {
         next(error);

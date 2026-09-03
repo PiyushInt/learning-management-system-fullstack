@@ -20,7 +20,7 @@ export const submitAssignment = async (req, res, next) => {
 export const getSubmissions = async (req, res, next) => {
     try {
         const { id: assignmentId } = req.params;
-        const submissions = await submissionService.getSubmissionsByAssignment(assignmentId);
+        const submissions = await submissionService.getSubmissionsByAssignment(assignmentId, req.user.id);
         res.json(submissions);
     } catch (error) {
         next(error);

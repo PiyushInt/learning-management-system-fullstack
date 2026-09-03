@@ -11,7 +11,7 @@ router.get('/:id', getCourse);
 router.post('/', authenticateToken, authorizeRole('TEACHER'), createCourse);
 router.post('/:id/enroll', authenticateToken, authorizeRole('STUDENT'), enrollStudent);
 
-router.get('/:id/assignments', getAssignments);
+router.get('/:id/assignments', authenticateToken, getAssignments);
 router.post('/:id/assignments', authenticateToken, authorizeRole('TEACHER'), createAssignment);
 
 export default router;
