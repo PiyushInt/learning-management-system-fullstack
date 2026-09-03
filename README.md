@@ -1,4 +1,5 @@
 # Mini LMS (Learning Management System) Backend
+[![CI Pipeline](https://github.com/PiyushInt/learning-management-system-fullstack/actions/workflows/ci.yml/badge.svg)](https://github.com/PiyushInt/learning-management-system-fullstack/actions/workflows/ci.yml)
 
 An advanced, resilient, and secure RESTful API for a Learning Management System designed to handle core educational workflows: course creation, student enrollment, assignment distribution, and grade-less submission tracking.
 
